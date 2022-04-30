@@ -1,0 +1,204 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+const int cleft = 1, cright = -1, cup = 1, cdown = -1;
+char cube[12][9];
+char* ref[12][12];
+int tc, n;
+
+void swap(int& a, int& b) {
+	int temp = a;
+	a = b;
+	b = temp;
+}
+
+void set(int y, int x, char v) {
+	for(int i = y; i<y+3; i++) {
+		for(int j=x; j<x+3; j++) {
+			cube[i][j] = v;
+		}
+	}
+}
+
+void init() {
+	cin >> tc;
+	set(0, 3, 'o'); // back
+	set(3, 3, 'w'); // top
+	set(6, 3, 'r'); // front
+	set(9, 3, 'y'); // below
+	set(6, 0, 'g'); // left
+	set(6, 6, 'b'); // right
+	for(int i=0; i<12; i++) {
+		for(int j=0; j<9; j++) {
+			ref[i][j] = &cube[i][j];
+		}
+	}
+	for(int i=0; i < 3; i++) {
+		for(int j=0; j<3; j++) {
+			ref[6+i][9+j] = &cube[2-i][5-j];
+		}
+	}
+	for(int i=0; i < 3; i++) {
+		ref[5][2-i] = &cube[6+i][2];
+		ref[5][6+i] = &cube[6+i][6];
+		ref[5][9+i] = &cube[9][5-i];
+	}
+	for(int i=0; i < 3; i++) {
+		ref[3][2-i] = &cube[6+i][0];
+		ref[3][6+i] = &cube[6+i][8];
+		ref[3][9+i] = &cube[11][5-i];
+	}
+}
+
+void print_cube_all() {
+	for(int i=0; i<12; i++) {
+		for(int j=0; j<12; j++) {
+			if(ref[i][j] != 0 && *ref[i][j] != 0) cout << *ref[i][j];
+			else cout << ' ';
+		}
+		cout << '\n';
+	}
+}
+
+void print_cube_top() {
+	for(int i=3; i<6; i++) {
+		for(int j=3; j<6; j++) {
+			cout << *ref[i][j];
+		}
+		cout << '\n';
+	}
+}
+
+void horizontal(int s, int dir) {
+	// s = [6, 9) // dir = { cleft, cright }
+	for(int i=0; i<9; i++) {
+		swap(*ref[s][((i*dir)+12)%12], *ref[s][((i*dir+(3*dir))+12)%12]);
+	}
+}
+
+void vertical(int s, int dir) {
+	// s = [3, 6) // dir = { cup, cdown }
+	for(int i=0; i<9; i++) {
+		swap(*ref[((i*dir)+12)%12][s], *ref[((i*dir+(3*dir))+12)%12][s]);
+	}
+}
+
+void rotate_clock(int s, int e) {
+	char temp[3][3];
+	for(int i=0; i<3; i++) {
+		for(int j=0; j<3; j++) {
+			temp[j][2-i] = cube[i+s][j+e];
+		}
+	}
+	for(int i=0; i<3; i++) {
+		for(int j=0; j<3; j++) {
+			cube[i+s][j+e] = temp[i][j];
+		}
+	}
+}
+
+void rotate_counter(int s, int e) {
+	char temp[3][3];
+	for(int i=0; i<3; i++) {
+		for(int j=0; j<3; j++) {
+			temp[j][i] = cube[i+s][j+e];
+		}
+	}
+	for(int i=0; i<3; i++) {
+		for(int j=0; j<3; j++) {
+			cube[i+s][j+e] = temp[i][j];
+		}
+	}
+}
+
+void solution() {
+	for(int i=0; i<tc; i++) {
+		cin >> n;
+		set(0, 3, 'o'); // back
+		set(3, 3, 'w'); // top
+		set(6, 3, 'r'); // front
+		set(9, 3, 'y'); // below
+		set(6, 0, 'g'); // left
+		set(6, 6, 'b'); // right
+		string c;
+		for(int i=0; i<n; i++) {
+			cin >> c;
+			if(c[0] == 'U') {
+				switch(c[1]) {
+					case '+':
+					rotate_clock(3, 3);
+					horizontal(6, cleft);
+					break;
+					case '-':
+					rotate_counter(3, 3);
+					horizontal(6, cright);
+					break;
+				}
+			} else if(c[0] == 'D') {
+				switch(c[1]) {
+					case '+':
+					rotate_clock(9, 3);
+					horizontal(8, cright);
+					break;
+					case '-':
+					rotate_counter(9, 3);
+					horizontal(8, cleft);
+					break;
+				}
+			} else if(c[0] == 'F') {
+				switch(c[1]) {
+					case '+':
+					rotate_clock(6, 3);
+					horizontal(5, cright);
+					break;
+					case '-':
+					rotate_counter(6, 3);
+					horizontal(5, cleft);
+					break;
+				}
+			} else if(c[0] == 'B') {
+				switch(c[1]) {
+					case '+':
+					rotate_clock(0, 3);
+					horizontal(3, cleft);
+					break;
+					case '-':
+					rotate_counter(0, 3);
+					horizontal(3, cright);
+					break;
+				}
+			} else if(c[0] == 'L') {
+				switch(c[1]) {
+					case '+':
+					rotate_clock(6, 0);
+					vertical(3, cdown);
+					break;
+					case '-':
+					rotate_counter(6, 0);
+					vertical(3, cup);
+					break;
+				}
+			} else if(c[0] == 'R') {
+				switch(c[1]) {
+					case '+':
+					rotate_clock(6, 6);
+					vertical(5, cup);
+					break;
+					case '-':
+					rotate_counter(6, 6);
+					vertical(5, cdown);
+					break;
+				}
+			}
+		}
+		print_cube_all();
+	}
+}
+
+int main() {
+	init();
+	solution();
+	// print_cube_all();
+	return 0;
+}
