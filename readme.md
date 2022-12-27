@@ -1,4 +1,7 @@
+## _History_
 
+**2022.02.** Graduate Chungbuk Univ</br>
+**2022.08.** Samsung Electronics DX
 
 ## _Github Status_
 
